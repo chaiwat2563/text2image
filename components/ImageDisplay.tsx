@@ -1,15 +1,31 @@
-
 import React from 'react';
-import { LoadingSpinner, ErrorIcon, ImageIcon, DownloadIcon } from './icons';
+import { LoadingSpinner, ErrorIcon, ImageIcon, DownloadIcon, PreviousIcon, NextIcon } from './icons';
 
 interface ImageDisplayProps {
   imageUrl: string | null;
   isLoading: boolean;
   error: string | null;
   onDownload: () => void;
+  onPrevious: () => void;
+  onNext: () => void;
+  canPrevious: boolean;
+  canNext: boolean;
+  historyCount?: number;
+  currentIndex?: number;
 }
 
-export const ImageDisplay: React.FC<ImageDisplayProps> = ({ imageUrl, isLoading, error, onDownload }) => {
+export const ImageDisplay: React.FC<ImageDisplayProps> = ({ 
+  imageUrl, 
+  isLoading, 
+  error, 
+  onDownload,
+  onPrevious,
+  onNext,
+  canPrevious,
+  canNext,
+  historyCount,
+  currentIndex,
+}) => {
   const renderContent = () => {
     if (isLoading) {
       return (
@@ -21,10 +37,10 @@ export const ImageDisplay: React.FC<ImageDisplayProps> = ({ imageUrl, isLoading,
     }
     if (error) {
       return (
-        <div className="flex flex-col items-center justify-center gap-4 text-red-400">
-          <ErrorIcon />
-          <p className="text-lg font-semibold">Generation Failed</p>
-          <p className="text-center text-sm">{error}</p>
+        <div className="flex flex-col items-center justify-center gap-4 text-center p-6 bg-red-900/20 border border-red-500/30 rounded-lg max-w-lg mx-auto">
+          <ErrorIcon className="w-16 h-16 text-red-400/80" />
+          <h3 className="text-xl font-semibold text-red-300">An Error Occurred</h3>
+          <p className="text-base text-red-300/80">{error}</p>
         </div>
       );
     }
@@ -58,6 +74,27 @@ export const ImageDisplay: React.FC<ImageDisplayProps> = ({ imageUrl, isLoading,
           <DownloadIcon />
           <span>Download</span>
         </button>
+      )}
+       {imageUrl && !isLoading && !error && historyCount && historyCount > 1 && (
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-4 bg-gray-900/70 backdrop-blur-sm py-1.5 px-3 rounded-full shadow-lg">
+          <button
+            onClick={onPrevious}
+            disabled={!canPrevious}
+            className="p-2 rounded-full bg-purple-600 hover:bg-purple-700 text-white disabled:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            aria-label="Previous image"
+          >
+            <PreviousIcon className="w-4 h-4" />
+          </button>
+          <span className="font-mono text-sm text-gray-200 select-none">{currentIndex} / {historyCount}</span>
+          <button
+            onClick={onNext}
+            disabled={!canNext}
+            className="p-2 rounded-full bg-purple-600 hover:bg-purple-700 text-white disabled:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            aria-label="Next image"
+          >
+            <NextIcon className="w-4 h-4" />
+          </button>
+        </div>
       )}
     </div>
   );
